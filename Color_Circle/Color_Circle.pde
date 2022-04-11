@@ -7,7 +7,10 @@ color[] objColor;   //Color info of each object
 float objRad;        //Radius of whole object
 float mainRad;       //Main(Center) color ball radius
 color mainColor;     //Main(Center) color ball color
+float colorProgress; //for Main color ball color animation... 
 float accelerationAnimation;  //For rotation animation
+// this variable is target color about main color ball
+color targetColor = #FFFFFF;
 
 // Project Variable
 float maxRad;          //Maximum Radius
@@ -38,6 +41,16 @@ float time;
 
 PFont f;
 
+// Math Function....
+float distance(float x1, float y1, float x2, float y2) {
+  return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
+}
+
+// Sine Animation
+float animInOutQuart(float progress) {
+  return progress < 0.5 ? 8 * pow(progress, 4) : 1 - pow(-2 * progress + 2, 4) / 2;
+}
+
 void setup() {
   //Init Project
   size(800, 600);
@@ -51,13 +64,14 @@ void setup() {
   minRad = 100;
   objRad = 30;
   mainRad = 1;
+  colorProgress = 0;
   maxDistance = 800;
   minDistance = 200;
   currentDistance = 0; //Start Position
   
   objCount = 36;
   
-  currentSpeed = 3;
+  currentSpeed = 5;
   accelerationAnimation = -100;
 
   objPointX = new float[objCount];
@@ -93,16 +107,16 @@ void setup() {
 
 // Check what object is clicked with cursor and object position
 void checkObjClicked(int posX, int posY) {
+  float dist = 0;
+  
   for (int i = 0; i < objCount; i++) {
-    
-    //Simple Box Check Algorithm
-    if (objPointX[i] - objRad < posX && posX < objPointX[i] + objRad) {
-      if (objPointY[i] - objRad < posY && posY < objPointY[i] + objRad) {
-        if (i != clickedIndex) {  
-          clickedIndex = i;
-          accelerationAnimation = 200;
-          break;
-        }
+    dist = distance(objPointX[i], objPointY[i], posX, posY);
+    //Simple Circle and Point Check Algorithm
+    if (dist <= objRad) {
+      if (i != clickedIndex) {  
+        clickedIndex = i;
+        accelerationAnimation = 200;
+        break;
       }
     }
     // If, user clicked background or main color ball
@@ -121,9 +135,6 @@ void drawAndMoveObj() {
   // time is essential to rotate objects
   // time will be used for object angle(degrees)
   time = ((time + (currentSpeed + accelerationAnimation) * deltaTime)) % 360;
-  
-  // this variable is target color about main color ball
-  color targetColor = #FFFFFF;
   
   // Controll object distance and main color ball radius
   if (clickedIndex != -1) {
@@ -148,11 +159,15 @@ void drawAndMoveObj() {
   
   // If, any object didn't clicked, than main color ball would change rainbow color
   if(clickedIndex == -1) {
-    targetColor = color(time, 360, 360);
+    colorProgress -= 0.5 * deltaTime;
   }
+  else {
+    colorProgress += 0.5 * deltaTime;
+  }
+  colorProgress = constrain(colorProgress, 0.0f, 1.0f);
   
   // Draw Main Color Ball!
-  mainColor = lerpColor(mainColor, targetColor, currentSpeed * deltaTime);
+  mainColor = lerpColor(color(time, 360, 360), targetColor, animInOutQuart(colorProgress));
   fill(mainColor);
   ellipse(centerPosX, centerPosY, mainRad, mainRad);
 }
