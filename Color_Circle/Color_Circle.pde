@@ -46,7 +46,7 @@ float distance(float x1, float y1, float x2, float y2) {
   return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
 }
 
-// Sine Animation
+// For Animation
 float animInOutQuart(float progress) {
   return progress < 0.5 ? 8 * pow(progress, 4) : 1 - pow(-2 * progress + 2, 4) / 2;
 }
@@ -69,7 +69,7 @@ void setup() {
   minDistance = 200;
   currentDistance = 0; //Start Position
   
-  objCount = 36;
+  objCount = 32;
   
   currentSpeed = 5;
   accelerationAnimation = -100;
@@ -147,8 +147,8 @@ void drawAndMoveObj() {
 
   // Move Object and Draw!
   for (int i = 0; i < objCount; i++) {
-    objPointX[i] = centerPosX + cos(radians(time + (360 / objCount) * i + 3 * accelerationAnimation)) * currentDistance;
-    objPointY[i] = centerPosY + sin(radians(time + (360 / objCount) * i + 3 * accelerationAnimation)) * currentDistance;
+    objPointX[i] = centerPosX + cos(radians(time + (360f / objCount) * i + 3 * accelerationAnimation)) * currentDistance;
+    objPointY[i] = centerPosY + sin(radians(time + (360f / objCount) * i + 3 * accelerationAnimation)) * currentDistance;
     
     if(clickedIndex == i) {
       targetColor = objColor[i];
